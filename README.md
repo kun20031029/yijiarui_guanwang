@@ -13,8 +13,9 @@ pnpm dev
 # or
 bun dev
 ```
-通过pm2在服务器生产环境启动
-端口需要根据实际情况填写
+
+通过 pm2 在服务器生产环境启动，端口需要根据实际情况填写：
+
 ```bash
 PORT=3010 pm2 start npm --name yijiarui-website
 ```
