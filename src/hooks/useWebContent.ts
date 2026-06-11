@@ -20,6 +20,13 @@ interface UseWebContentReturn {
   error: string | null
 }
 
+function normalizeWebContent(content: WebContent): WebContent {
+  return {
+    ...content,
+    contact_wechat_img_url: '/images/qr-code/wechat-qr.png',
+  }
+}
+
 export function useWebContent(): UseWebContentReturn {
   const [webContent, setWebContent] = useState<WebContent | null>(null)
   const [loading, setLoading] = useState(true)
@@ -51,13 +58,13 @@ export function useWebContent(): UseWebContentReturn {
         // 处理不同的返回格式
         if (Array.isArray(data) && Array.isArray(data[0]) && data[0].length > 0) {
           // 格式1: [[...]] - 二维数组，取第一条记录
-          setWebContent(data[0][0])
+          setWebContent(normalizeWebContent(data[0][0]))
         } else if (Array.isArray(data) && data.length > 0) {
           // 格式2: [...] - 一维数组，取第一条记录
-          setWebContent(data[0])
+          setWebContent(normalizeWebContent(data[0]))
         } else if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
           // 格式3: {} - 直接是对象
-          setWebContent(data)
+          setWebContent(normalizeWebContent(data))
         } else {
           console.warn('Received empty or unexpected data format, setting null')
           setWebContent(null)

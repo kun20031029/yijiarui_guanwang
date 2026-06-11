@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getApiUrl } from '@/config/api'
+import { getApiUrl, normalizeAssetUrl } from '@/config/api'
 
 export interface Certification {
   id: string
@@ -24,6 +24,27 @@ interface UseCertificationsReturn {
   loading: boolean
   error: string | null
   getCertificationsByStatsId: (statsId: string) => Certification[]
+}
+
+const localCertificationImages: Array<[string, string]> = [
+  ['系统截图2', '/images/about/zizhi/系统截图2.png'],
+  ['系统截图1', '/images/about/zizhi/系统截图1.png'],
+  ['中国设备监理甲级资质', '/images/about/zizhi/中国设备监理甲级资质.png'],
+  ['营业执照', '/images/about/zizhi/营业执照.png'],
+  ['ISO9001', '/images/about/zizhi/ISO9001质量管理认证证书.png'],
+  ['IS014001', '/images/about/zizhi/IS014001环境管理体系认证证书.png'],
+  ['ISO14001', '/images/about/zizhi/IS014001环境管理体系认证证书.png'],
+  ['ISO18001', '/images/about/zizhi/ISO18001职业健康安全管理体系认证证书.png'],
+]
+
+function normalizeCertification(cert: Certification): Certification {
+  const sourceText = `${cert.image_caption} ${cert.image_caption_en} ${cert.image_url}`
+  const matchedLocalImage = localCertificationImages.find(([keyword]) => sourceText.includes(keyword))
+
+  return {
+    ...cert,
+    image_url: matchedLocalImage?.[1] || normalizeAssetUrl(cert.image_url),
+  }
 }
 
 export function useCertifications(): UseCertificationsReturn {
@@ -63,7 +84,7 @@ export function useCertifications(): UseCertificationsReturn {
             .sort((a: Certification, b: Certification) =>
               parseInt(a.order_index) - parseInt(b.order_index)
             )
-          setCertifications(activeCertifications)
+          setCertifications(activeCertifications.map(normalizeCertification))
         } else if (Array.isArray(data)) {
           // 格式2: [...] - 一维数组
           const activeCertifications = data
@@ -71,7 +92,7 @@ export function useCertifications(): UseCertificationsReturn {
             .sort((a: Certification, b: Certification) =>
               parseInt(a.order_index) - parseInt(b.order_index)
             )
-          setCertifications(activeCertifications)
+          setCertifications(activeCertifications.map(normalizeCertification))
         } else if (typeof data === 'object' && data !== null) {
           // 格式3: {} - 空对象或其他对象格式
           console.warn('Received empty object or unexpected object format, setting empty array')

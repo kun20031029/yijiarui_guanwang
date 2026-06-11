@@ -1,6 +1,7 @@
 'use client'
 
 import { CSSProperties, ImgHTMLAttributes, useEffect, useMemo, useRef, useState } from 'react'
+import { normalizeAssetUrl } from '@/config/api'
 
 type SafeImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 'width' | 'height'> & {
   src: string
@@ -48,12 +49,13 @@ export default function SafeImage({
   void sizes
 
   const fallbackSrc = useMemo(() => createFallbackSrc(alt), [alt])
+  const normalizedSrc = useMemo(() => normalizeAssetUrl(src || ''), [src])
   const imageRef = useRef<HTMLImageElement>(null)
-  const [currentSrc, setCurrentSrc] = useState(src || fallbackSrc)
+  const [currentSrc, setCurrentSrc] = useState(normalizedSrc || fallbackSrc)
 
   useEffect(() => {
-    setCurrentSrc(src || fallbackSrc)
-  }, [fallbackSrc, src])
+    setCurrentSrc(normalizedSrc || fallbackSrc)
+  }, [fallbackSrc, normalizedSrc])
 
   useEffect(() => {
     const image = imageRef.current

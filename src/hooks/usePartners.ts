@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getApiUrl } from '@/config/api'
+import { getApiUrl, normalizeAssetUrl } from '@/config/api'
 
 interface Partner {
   id: string
@@ -17,6 +17,22 @@ interface UsePartnersReturn {
   partners: Partner[]
   loading: boolean
   error: string | null
+}
+
+const localPartnerLogos: Record<string, string> = {
+  国家能源集团: '/images/logos/国家能源集团.png',
+  华润电力: '/images/logos/华润电力.png',
+  中国能建: '/images/logos/中国能建.png',
+  中国电建: '/images/logos/中国电建.png',
+  金风科技: '/images/logos/金风科技.png',
+  中车风电: '/images/logos/中车风电.png',
+}
+
+function normalizePartner(partner: Partner): Partner {
+  return {
+    ...partner,
+    logo_url: localPartnerLogos[partner.name_zh] || normalizeAssetUrl(partner.logo_url),
+  }
 }
 
 export function usePartners(): UsePartnersReturn {
@@ -55,7 +71,7 @@ export function usePartners(): UsePartnersReturn {
             .sort((a: Partner, b: Partner) => 
               parseInt(a.order_index) - parseInt(b.order_index)
             )
-          setPartners(activePartners)
+          setPartners(activePartners.map(normalizePartner))
         } else if (Array.isArray(data)) {
           // 格式2: [...] - 一维数组
           const activePartners = data
@@ -63,7 +79,7 @@ export function usePartners(): UsePartnersReturn {
             .sort((a: Partner, b: Partner) => 
               parseInt(a.order_index) - parseInt(b.order_index)
             )
-          setPartners(activePartners)
+          setPartners(activePartners.map(normalizePartner))
         } else {
           console.warn('Received empty object or unexpected object format, setting empty array')
           setPartners([])

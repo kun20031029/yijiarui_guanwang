@@ -6,6 +6,7 @@ import AnimatedSection from './AnimatedSection'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useBanners } from '@/hooks/useBanners'
+import { normalizeAssetUrl } from '@/config/api'
 
 export default function Hero() {
   const { isDarkMode } = useTheme()
@@ -16,7 +17,7 @@ export default function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   // 从数据库获取的图片数组
-  const backgroundImages = banners.map(banner => banner.image_url)
+  const backgroundImages = banners.map(banner => normalizeAssetUrl(banner.image_url))
 
 
   
